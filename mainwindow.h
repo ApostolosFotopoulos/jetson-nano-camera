@@ -13,9 +13,18 @@
 #include <QtConcurrent>
 #include <QRunnable>
 #include <opencv2/core/core.hpp>
-#include <opencv2/imgproc.hpp>
 #include <opencv2/opencv.hpp>
+#include <opencv2/videoio.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <imagelabel.h>
+#include <camera.h>
+#include <QFile>
+#include <QTextStream>
+#include <QString>
+#include <QByteArray>
+#include <QJsonObject>
+#include <QVariantMap>
 
 using namespace QtConcurrent;
 using namespace cv;
@@ -26,17 +35,23 @@ Q_OBJECT
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void readJSON();
 public slots:
     void captureImage();
-    void updateImage();
-signals:
-    void updateImageSignal();
+    void goToNewOrigin();
+    void goToCapture();
+    void goToCalibration();
+    void goToPlayer();
 private:
-    QPushButton *newOriginButton;
-    QPushButton *mainButton;
-    QPushButton *calButton;
-    QPushButton *playerButton;
-    ImageLabel *imgLabel;
+    QPushButton *newOriginButton=nullptr;
+    QPushButton *mainButton=nullptr;
+    QPushButton *calButton=nullptr;
+    QPushButton *playerButton=nullptr;
+    ImageLabel *imgLabel=nullptr;
     bool isRunning;
+    cv::VideoCapture cap;
+    cv::Mat frame;
+    int originX;
+    int originY;
 };
 #endif // MAINWINDOW_H

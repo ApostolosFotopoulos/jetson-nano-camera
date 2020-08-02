@@ -26,11 +26,14 @@ HEADERS += \
     imagelabel.h \
     mainwindow.h\
 
-INCLUDEPATH += -I/usr/local/include/opencv4
-LIBS += $(shell pkg-config opencv --libs)
+INCLUDEPATH += /usr/include/opencv4
+LIBS += -L/usr/lib `pkg-config --libs opencv` -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc
 
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    resources.qrc

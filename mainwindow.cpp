@@ -1,14 +1,11 @@
 #include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
-
-    this->isRunning = true;
-
     // Title of the window
     this->setWindowTitle("Multimedia Player");
 
     // Set the window style
-    this->setStyleSheet("font-size:20px;");
+    this->setStyleSheet("font-size:18px;background-color:#383838;color:#fff");
 
     // Create the widget for the window
     QWidget *widget = new QWidget(this);
@@ -18,7 +15,16 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
     mainLayout->setAlignment(Qt::AlignVCenter);
 
     // Initialize the capture
-    VideoCapture cap(0);
+    Camera c;
+    this->cap = VideoCapture(c.stream(),CAP_GSTREAMER);
+    if(!this->cap.isOpened()){
+        std::cout<<"Exited"<<std::endl;
+        exit(1);
+    }
+
+    // Read JSON to get the calibration coordinates
+    this->readJSON();
+    this->isRunning = true;
 
     // ------------------- Contents for the main window ----------------------//
 
@@ -36,7 +42,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
     imageLayout->setAlignment(Qt::AlignCenter);
     mainLayout->addLayout(imageLayout);
     QObject::connect(this->imgLabel,&ImageLabel::startCaptureSignal,this,&MainWindow::captureImage);
-    QObject::connect(this,&MainWindow::updateImageSignal,this,&MainWindow::updateImage);
     this->imgLabel->startTheCapture();
 
     //Create the buttons layout
@@ -63,13 +68,17 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
     buttonsLayout->addWidget(playerButton);
 
     // Button events
+    QObject::connect(this->newOriginButton,&QPushButton::clicked,this,&MainWindow::goToNewOrigin);
+    QObject::connect(this->mainButton,&QPushButton::clicked,this,&MainWindow::goToCapture);
+    QObject::connect(this->calButton,&QPushButton::clicked,this,&MainWindow::goToCalibration);
+    QObject::connect(this->playerButton,&QPushButton::clicked,this,&MainWindow::goToPlayer);
 
     // Set the main layout to window
     this->setCentralWidget(widget);
     widget->setLayout(mainLayout);
 
     // Set minimum size for the window
-    this->setMinimumSize(QSize(500,500));
+    this->setMinimumSize(QSize(960,616));
 }
 
 MainWindow::~MainWindow(){
@@ -79,20 +88,78 @@ MainWindow::~MainWindow(){
 
     // Clean the events
     QObject::disconnect(this->imgLabel,&ImageLabel::startCaptureSignal,this,&MainWindow::captureImage);
-    QObject::disconnect(this,&MainWindow::updateImageSignal,this,&MainWindow::updateImage);
+    QObject::disconnect(this->newOriginButton,&QPushButton::clicked,this,&MainWindow::goToNewOrigin);
+    QObject::disconnect(this->mainButton,&QPushButton::clicked,this,&MainWindow::goToCapture);
+    QObject::disconnect(this->calButton,&QPushButton::clicked,this,&MainWindow::goToCalibration);
+    QObject::disconnect(this->playerButton,&QPushButton::clicked,this,&MainWindow::goToPlayer);
+
+    // Release the cap resources
+    this->cap.release();
 }
 
 void MainWindow::captureImage(){
     run([=](){
         while(this->isRunning){
-           std::cout<<"Capture"<<std::endl;
-           emit updateImageSignal();
+            // Capture the frame
+            this->cap >> this->frame;
+
+            // Get height and width
+            int width = this->frame.size().width;
+            int height = this->frame.size().height;
+
+            // Horizontal line
+            line(this->frame,Point(this->originX,this->originY),Point(this->originX+width,this->originY),Scalar(0,0,255),2);
+            line(this->frame,Point(this->originX,this->originY),Point(this->originX-width,this->originY),Scalar(0,0,255),2);
+
+            // Vertical line
+            line(this->frame,Point(this->originX,this->originY),Point(this->originX,this->originY+height),Scalar(0,0,255),2);
+            line(this->frame,Point(this->originX,this->originY),Point(this->originX,this->originY-height),Scalar(0,0,255),2);
+
+            // Show the image
+            Mat dest;
+            cvtColor(this->frame,dest,cv::COLOR_RGB2BGR);
+            QImage image1 = QImage((uchar *)dest.data,dest.cols,dest.rows,dest.step,QImage::Format_RGB888);
+            this->imgLabel->setPixmap(QPixmap::fromImage(image1));
         }
     });
 }
-void MainWindow::updateImage(){
-    run([=](){
-        std::cout<<"Update"<<std::endl;
-    });
+void MainWindow::readJSON(){
+  cout<<"Reading the JSON..."<<endl;
+
+  // Open the file
+  QFile file_obj(":/data/params.json");
+  if(!file_obj.open(QIODevice::ReadOnly)){
+    cout<<"Failed to open ./params.json";
+    exit(1);
+  }
+
+  // Read the content
+  QTextStream file_text(&file_obj);
+  QString json_string;
+  json_string = file_text.readAll();
+  file_obj.close();
+
+  // Pass the content from json format to qvariant
+  QByteArray json_bytes = json_string.toLocal8Bit();
+  auto json_doc=QJsonDocument::fromJson(json_bytes);
+  QJsonObject json_obj=json_doc.object();
+  QVariantMap json_map = json_obj.toVariantMap();
+
+  // Set the parameters
+  this->originX = json_map["originX"].toInt();
+  this->originY = json_map["originY"].toInt();
+}
+
+void MainWindow::goToNewOrigin(){
+    std::cout<<"New origin"<<std::endl;
+}
+void MainWindow::goToCapture(){
+    std::cout<<"Capture"<<std::endl;
+}
+void MainWindow::goToCalibration(){
+    std::cout<<"Calibration"<<std::endl;
+}
+void MainWindow::goToPlayer(){
+    std::cout<<"Player"<<std::endl;
 }
 
