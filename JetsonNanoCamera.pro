@@ -1,6 +1,6 @@
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets  concurrent
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets  concurrent multimedia multimediawidgets
 
 CONFIG += c++11
 
@@ -23,7 +23,12 @@ SOURCES += \
     neworiginwindow.cpp \
     originlabel.cpp \
     calibrationwindow.cpp \
-    calibrationlabel.cpp
+    calibrationlabel.cpp \
+    player.cpp \
+    playercontrols.cpp \
+    rangeslider.cpp \
+    toolbar.cpp \
+    video.cpp
 
 HEADERS += \
     camera.h \
@@ -32,7 +37,12 @@ HEADERS += \
     neworiginwindow.h \
     originlabel.h \
     calibrationwindow.h \
-    calibrationlabel.h
+    calibrationlabel.h \
+    player.h \
+    playercontrols.h \
+    rangeslider.h \
+    toolbar.h \
+    video.h
 
 INCLUDEPATH += /usr/include/opencv4
 LIBS += -L/usr/lib `pkg-config --libs opencv` -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lm
@@ -42,5 +52,9 @@ LIBS += -L/usr/lib `pkg-config --libs opencv` -lopencv_core -lopencv_videoio -lo
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    resources.qrc
+
 
 

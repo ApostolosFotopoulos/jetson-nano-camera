@@ -29,6 +29,7 @@
 #include <QCloseEvent>
 #include <QCoreApplication>
 #include <calibrationwindow.h>
+#include <player.h>
 
 using namespace QtConcurrent;
 using namespace cv;

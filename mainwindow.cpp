@@ -5,7 +5,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
     this->setWindowTitle("Multimedia Player");
 
     // Set the window style
-    this->setStyleSheet("font-size:18px;background-color:#383838;color:#fff");
+    this->setStyleSheet("font-size:15px;background-color:#383838;color:#fff");
 
     // Create the widget for the window
     QWidget *widget = new QWidget(this);
@@ -169,6 +169,12 @@ void MainWindow::goToCalibration(){
 }
 void MainWindow::goToPlayer(){
     std::cout<<"Player"<<std::endl;
+    this->hide();
+    this->isRunning=false;
+    this->cap->release();
+    Player *w = new Player();
+    w->show();
+    this->close();
 }
 void MainWindow::closeEvent(QCloseEvent *event){
     if(event->spontaneous()){

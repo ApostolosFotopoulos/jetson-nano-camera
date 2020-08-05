@@ -6,7 +6,7 @@ NewOriginWindow::NewOriginWindow(QWidget *parent): QMainWindow(parent){
     this->setWindowTitle("Choose Origin");
 
     // Set the window style
-    this->setStyleSheet("font-size:18px;background-color:#383838;color:#fff");
+    this->setStyleSheet("font-size:15px;background-color:#383838;color:#fff");
 
     // Create the widget for the window
     QWidget *widget = new QWidget(this);
