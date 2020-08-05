@@ -1,8 +1,9 @@
-#include "mainwindow.h"
+#include "neworiginwindow.h"
 
-MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
+NewOriginWindow::NewOriginWindow(QWidget *parent): QMainWindow(parent){
+
     // Title of the window
-    this->setWindowTitle("Multimedia Player");
+    this->setWindowTitle("Choose Origin");
 
     // Set the window style
     this->setStyleSheet("font-size:18px;background-color:#383838;color:#fff");
@@ -14,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
     QVBoxLayout *mainLayout = new QVBoxLayout(widget);
     mainLayout->setAlignment(Qt::AlignVCenter);
 
-    // Initialize the capture
+    // Set the capture
     Camera c;
     this->cap = new VideoCapture(c.stream(),CAP_GSTREAMER);
     if(!this->cap->isOpened()){
@@ -22,26 +23,17 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
         exit(1);
     }
 
-    // Read JSON to get the calibration coordinates
+    // Read the coordinates from JSON
     this->readJSON();
-    this->isRunning = true;
+    this->isRunning= true;
 
-    // ------------------- Contents for the main window ----------------------//
-
-    // Create the label
-    QLabel *label = new QLabel("Do you agree with the below origin?");
-    QHBoxLayout *labelLayout = new QHBoxLayout();
-    labelLayout->addWidget(label);
-    labelLayout->setAlignment(Qt::AlignCenter);
-    mainLayout->addLayout(labelLayout);
-
-    // Create the image label
-    this->imgLabel = new ImageLabel();
+    // Create the clickable label for the origin
+    this->imgLabel = new OriginLabel();
     QHBoxLayout *imageLayout = new QHBoxLayout();
     imageLayout->addWidget(this->imgLabel);
     imageLayout->setAlignment(Qt::AlignCenter);
     mainLayout->addLayout(imageLayout);
-    QObject::connect(this->imgLabel,&ImageLabel::startCaptureSignal,this,&MainWindow::captureImage);
+    QObject::connect(this->imgLabel,&OriginLabel::startCaptureSignal,this,&NewOriginWindow::captureImage);
     this->imgLabel->startTheCapture();
 
     //Create the buttons layout
@@ -52,49 +44,43 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
     // Create the buttons
 
     //- origin
-    this->newOriginButton = new QPushButton("New origin");
-    buttonsLayout->addWidget(this->newOriginButton);
-
-    //- main
-    this->mainButton = new QPushButton("Capture");
-    buttonsLayout->addWidget(this->mainButton);
-
-    //- calibration
-    this->calButton = new QPushButton("Calibrate");
-    buttonsLayout->addWidget(this->calButton);
-
-    //- player
-    this->playerButton = new QPushButton("Player");
-    buttonsLayout->addWidget(this->playerButton);
+    this->backButton = new QPushButton("Back to menu");
+    buttonsLayout->addWidget(this->backButton);
 
     // Button events
-    QObject::connect(this->newOriginButton,&QPushButton::clicked,this,&MainWindow::goToNewOrigin);
-    QObject::connect(this->mainButton,&QPushButton::clicked,this,&MainWindow::goToCapture);
-    QObject::connect(this->calButton,&QPushButton::clicked,this,&MainWindow::goToCalibration);
-    QObject::connect(this->playerButton,&QPushButton::clicked,this,&MainWindow::goToPlayer);
+    QObject::connect(this->backButton,&QPushButton::clicked,this,&NewOriginWindow::backToMenu);
 
     // Set the main layout to window
     this->setCentralWidget(widget);
     widget->setLayout(mainLayout);
 }
+NewOriginWindow::~NewOriginWindow(){
 
-MainWindow::~MainWindow(){
-
-    // Terminate the loop for update
+    // Stop the capturing
     this->isRunning = false;
 
     // Clean the events
-    QObject::disconnect(this->imgLabel,&ImageLabel::startCaptureSignal,this,&MainWindow::captureImage);
-    QObject::disconnect(this->newOriginButton,&QPushButton::clicked,this,&MainWindow::goToNewOrigin);
-    QObject::disconnect(this->mainButton,&QPushButton::clicked,this,&MainWindow::goToCapture);
-    QObject::disconnect(this->calButton,&QPushButton::clicked,this,&MainWindow::goToCalibration);
-    QObject::disconnect(this->playerButton,&QPushButton::clicked,this,&MainWindow::goToPlayer);
-
+    QObject::disconnect(this->backButton,&QPushButton::clicked,this,&NewOriginWindow::backToMenu);
+    QObject::disconnect(this->imgLabel,&OriginLabel::startCaptureSignal,this,&NewOriginWindow::captureImage);
 }
 
-void MainWindow::captureImage(){
+void NewOriginWindow::backToMenu(){
+    std::cout<<"Back to menu"<<std::endl;
+    this->hide();
+    this->isRunning=false;
+    this->cap->release();
+    MainWindow *w = new MainWindow();
+    w->show();
+    this->close();
+}
+void NewOriginWindow::captureImage(){
     run([=](){
         while(this->isRunning){
+
+            if(this->imgLabel->originX!=-1 && this->imgLabel->originY!=-1){
+                this->originX = this->imgLabel->originX;
+                this->originY = this->imgLabel->originY;
+            }
             // Capture the frame
             *this->cap >> this->frame;
 
@@ -116,9 +102,18 @@ void MainWindow::captureImage(){
             QImage image1 = QImage((uchar *)dest.data,dest.cols,dest.rows,dest.step,QImage::Format_RGB888);
             this->imgLabel->setPixmap(QPixmap::fromImage(image1));
         }
+        std::cout<<"Out....."<<std::endl;
     });
 }
-void MainWindow::readJSON(){
+void NewOriginWindow::closeEvent(QCloseEvent *event){
+    if(event->spontaneous()){
+        this->isRunning=false;
+        this->cap->release();
+        QCoreApplication::quit();
+    }
+    event->accept();
+}
+void NewOriginWindow::readJSON(){
   cout<<"Reading the JSON..."<<endl;
 
   // Open the file
@@ -145,37 +140,3 @@ void MainWindow::readJSON(){
   this->originY = json_map["originY"].toInt();
   std::cout<<json_string.toLocal8Bit().constData()<<std::endl;
 }
-
-void MainWindow::goToNewOrigin(){
-    std::cout<<"New origin"<<std::endl;
-    this->hide();
-    this->isRunning=false;
-    this->cap->release();
-    NewOriginWindow *w = new NewOriginWindow();
-    w->show();
-    this->close();
-}
-void MainWindow::goToCapture(){
-    std::cout<<"Capture"<<std::endl;
-}
-void MainWindow::goToCalibration(){
-    std::cout<<"Calibration"<<std::endl;
-    this->hide();
-    this->isRunning=false;
-    this->cap->release();
-    CalibrationWindow *w = new CalibrationWindow();
-    w->show();
-    this->close();
-}
-void MainWindow::goToPlayer(){
-    std::cout<<"Player"<<std::endl;
-}
-void MainWindow::closeEvent(QCloseEvent *event){
-    if(event->spontaneous()){
-        this->isRunning=false;
-        this->cap->release();
-        QCoreApplication::quit();
-    }
-    event->accept();
-}
-

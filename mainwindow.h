@@ -25,6 +25,10 @@
 #include <QByteArray>
 #include <QJsonObject>
 #include <QVariantMap>
+#include <neworiginwindow.h>
+#include <QCloseEvent>
+#include <QCoreApplication>
+#include <calibrationwindow.h>
 
 using namespace QtConcurrent;
 using namespace cv;
@@ -42,6 +46,7 @@ public slots:
     void goToCapture();
     void goToCalibration();
     void goToPlayer();
+    void closeEvent(QCloseEvent *event);
 private:
     QPushButton *newOriginButton=nullptr;
     QPushButton *mainButton=nullptr;
@@ -49,7 +54,7 @@ private:
     QPushButton *playerButton=nullptr;
     ImageLabel *imgLabel=nullptr;
     bool isRunning;
-    cv::VideoCapture cap;
+    cv::VideoCapture *cap=nullptr;
     cv::Mat frame;
     int originX;
     int originY;

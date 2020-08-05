@@ -19,15 +19,23 @@ SOURCES += \
     camera.cpp \
     imagelabel.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    neworiginwindow.cpp \
+    originlabel.cpp \
+    calibrationwindow.cpp \
+    calibrationlabel.cpp
 
 HEADERS += \
     camera.h \
     imagelabel.h \
     mainwindow.h\
+    neworiginwindow.h \
+    originlabel.h \
+    calibrationwindow.h \
+    calibrationlabel.h
 
 INCLUDEPATH += /usr/include/opencv4
-LIBS += -L/usr/lib `pkg-config --libs opencv` -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc
+LIBS += -L/usr/lib `pkg-config --libs opencv` -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lm
 
 
 # Default rules for deployment.
@@ -35,5 +43,4 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-RESOURCES += \
-    resources.qrc
+
