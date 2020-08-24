@@ -30,6 +30,7 @@
 #include <QCoreApplication>
 #include <calibrationwindow.h>
 #include <player.h>
+#include <capturewindow.h>
 
 using namespace QtConcurrent;
 using namespace cv;

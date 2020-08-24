@@ -157,6 +157,12 @@ void MainWindow::goToNewOrigin(){
 }
 void MainWindow::goToCapture(){
     std::cout<<"Capture"<<std::endl;
+    this->hide();
+    this->isRunning=false;
+    this->cap->release();
+    CaptureWindow *w = new CaptureWindow();
+    w->show();
+    this->close();
 }
 void MainWindow::goToCalibration(){
     std::cout<<"Calibration"<<std::endl;

@@ -28,7 +28,9 @@ SOURCES += \
     playercontrols.cpp \
     rangeslider.cpp \
     toolbar.cpp \
-    video.cpp
+    video.cpp \
+    capturewindow.cpp \
+    capturelabel.cpp
 
 HEADERS += \
     camera.h \
@@ -42,7 +44,9 @@ HEADERS += \
     playercontrols.h \
     rangeslider.h \
     toolbar.h \
-    video.h
+    video.h \
+    capturewindow.h \
+    capturelabel.h
 
 INCLUDEPATH += /usr/include/opencv4
 LIBS += -L/usr/lib `pkg-config --libs opencv` -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lm
