@@ -81,33 +81,39 @@ void CaptureWindow::closeEvent(QCloseEvent *event){
     }
     event->accept();
 }
-
 void CaptureWindow::captureImage(){
     run([=](){
         while(this->isRunning){
             // Capture the frame
-            *this->cap >> *this->frame;
+            *this->cap >> this->frame;
 
-            // Copy the frame to the record frame
-            *this->recordFrame = *this->frame;
+            this->recordFrame = new Mat(this->frame);
 
             // Show the image
             Mat dest;
-            cvtColor(*this->frame,dest,cv::COLOR_RGB2BGR);
+            cvtColor(this->frame,dest,cv::COLOR_RGB2BGR);
             QImage image1 = QImage((uchar *)dest.data,dest.cols,dest.rows,dest.step,QImage::Format_RGB888);
             this->imgLabel->setPixmap(QPixmap::fromImage(image1));
         }
     });
 }
 void CaptureWindow::recordImage(){
-    run([=](){
-        while(this->isRecording){
+    run([=]{
+        int codec = cv::VideoWriter::fourcc('X','V','I','D');
+        std::cout<<this->recordFPS<<std::endl;
+        this->videoWriter = new cv::VideoWriter(this->recordFileName,codec,this->recordFPS/5,Size(this->recordWidth,this->recordHeight),true);
 
+        while(this->isRecording){
             if(this->recordFrame){
-                std::cout<<"Capture.."<<std::endl;
+                Mat *dst = new Mat();
+                cvtColor(*this->recordFrame,*dst,cv::COLOR_RGB2BGR);
+                cv::resize(*this->recordFrame,*dst,Size(this->recordWidth,this->recordHeight));
+                this->videoWriter->write(*dst);
+                this->recordFrame = nullptr;
             }
         }
-        std::cout<<"Stopped.."<<std::endl;
+        // Release the video writer
+        this->videoWriter->release();
         this->recordFrame = nullptr;
     });
 }
@@ -123,9 +129,6 @@ void CaptureWindow::startRecord(){
         // Enable the combo box with the fps and dimensions
         this->recordOptions->setEnabled(true);
     } else {
-        // Turn on the recording
-        this->isRecording = true;
-
         // Change the text to the button
         this->recordButton->setText("Stop");
 
@@ -153,8 +156,10 @@ void CaptureWindow::startRecord(){
         this->recordFileName = generateFileName();
         std::cout<<this->recordFileName<<std::endl;
 
-        // Record the image
-        //recordImage();
+        // Turn on the recording
+        this->isRecording = true;
+
+        recordImage();
     }
 }
 

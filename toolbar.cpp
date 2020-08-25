@@ -59,7 +59,7 @@ void Toolbar::openFile(){
     // Setting for the file dialog
     fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
     fileDialog.setWindowTitle(tr("Open Files"));
-    fileDialog.setNameFilter("*.mp4");
+    fileDialog.setNameFilter("*.avi");
     fileDialog.setDirectory(QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).value(0, QDir::homePath()));
 
     // Save the urls

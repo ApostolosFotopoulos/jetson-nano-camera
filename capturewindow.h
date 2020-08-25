@@ -20,6 +20,8 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <random>
+#include <unistd.h>
+#include <mutex>
 
 using namespace QtConcurrent;
 using namespace cv;
@@ -37,7 +39,7 @@ private:
     bool isRunning = false;
     cv::VideoCapture *cap=nullptr;
     CaptureLabel *imgLabel=nullptr;
-    cv::Mat *frame=nullptr;
+    cv::Mat frame;
     cv::Mat *recordFrame=nullptr;
     double FPS;
     double recordFPS;
@@ -49,6 +51,8 @@ private:
     string recordFileName;
     string generateFileName();
     void recordImage();
+    cv::VideoWriter *videoWriter;
+    mutex mutexVid;
 };
 
 #endif // CAPTUREWINDOW_H
