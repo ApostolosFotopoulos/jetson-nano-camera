@@ -15,8 +15,15 @@
 #include <QHBoxLayout>
 #include <camera.h>
 #include <capturelabel.h>
+#include <QFuture>
+#include <QtConcurrent>
+#include <QComboBox>
+#include <QPushButton>
+#include <random>
 
+using namespace QtConcurrent;
 using namespace cv;
+
 class CaptureWindow: public QMainWindow{
 Q_OBJECT
 public:
@@ -25,10 +32,23 @@ public:
     void closeEvent(QCloseEvent *event);
 public slots:
     void captureImage();
+    void startRecord();
 private:
     bool isRunning = false;
     cv::VideoCapture *cap=nullptr;
     CaptureLabel *imgLabel=nullptr;
+    cv::Mat *frame=nullptr;
+    cv::Mat *recordFrame=nullptr;
+    double FPS;
+    double recordFPS;
+    double recordWidth;
+    double recordHeight;
+    QComboBox *recordOptions=nullptr;
+    QPushButton *recordButton=nullptr;
+    bool isRecording=false;
+    string recordFileName;
+    string generateFileName();
+    void recordImage();
 };
 
 #endif // CAPTUREWINDOW_H

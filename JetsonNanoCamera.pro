@@ -49,7 +49,7 @@ HEADERS += \
     capturelabel.h
 
 INCLUDEPATH += /usr/include/opencv4
-LIBS += -L/usr/lib `pkg-config --libs opencv` -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lm
+LIBS += -L/usr/lib `pkg-config --libs opencv` -L/usr/include/opencv4 -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lm
 
 
 # Default rules for deployment.
