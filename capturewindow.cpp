@@ -29,6 +29,11 @@ CaptureWindow::CaptureWindow(QWidget *parent):QMainWindow(parent){
     upperLayout->setAlignment(Qt::AlignHCenter);
     mainLayout->addLayout(upperLayout,Qt::AlignCenter);
 
+    // Create the back button
+    this->backButton = new QPushButton("Back");
+    upperLayout->addWidget(this->backButton);
+    QObject::connect(this->backButton,&QPushButton::clicked,this,&CaptureWindow::backToMenu);
+
     // Create the options for the record
     this->recordOptions = new QComboBox();
     this->recordOptions->setStyleSheet("width:200px");
@@ -72,6 +77,7 @@ CaptureWindow::~CaptureWindow(){
     // Disconnect all the events for the loop
     QObject::disconnect(this->imgLabel,&CaptureLabel::startCaptureSignal,this,&CaptureWindow::captureImage);
     QObject::disconnect(this->recordButton,&QPushButton::clicked,this,&CaptureWindow::startRecord);
+    QObject::disconnect(this->backButton,&QPushButton::clicked,this,&CaptureWindow::backToMenu);
 }
 void CaptureWindow::closeEvent(QCloseEvent *event){
     if(event->spontaneous()){
@@ -93,7 +99,12 @@ void CaptureWindow::captureImage(){
             Mat dest;
             cvtColor(this->frame,dest,cv::COLOR_RGB2BGR);
             QImage image1 = QImage((uchar *)dest.data,dest.cols,dest.rows,dest.step,QImage::Format_RGB888);
+
+            //image1 = image1.scaled(int(this->imgLabel->scaleFactor*dest.cols),int(this->imgLabel->scaleFactor*dest.rows),Qt::KeepAspectRatio);
             this->imgLabel->setPixmap(QPixmap::fromImage(image1));
+
+            std::cout<<int(this->imgLabel->scaleFactor*dest.cols)<<std::endl;
+            std::cout<<int(this->imgLabel->scaleFactor*dest.rows)<<std::endl;
         }
     });
 }
@@ -169,4 +180,14 @@ string CaptureWindow::generateFileName(){
     mt19937 generator(rd());
     shuffle(str.begin(),str.end(),generator);
     return str.substr(0,32)+".avi";
+}
+
+void CaptureWindow::backToMenu(){
+    std::cout<<"Back to menu"<<std::endl;
+    this->hide();
+    this->isRunning=false;
+    this->cap->release();
+    MainWindow *w = new MainWindow();
+    w->show();
+    this->close();
 }

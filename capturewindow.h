@@ -22,6 +22,9 @@
 #include <random>
 #include <unistd.h>
 #include <mutex>
+#include <QWheelEvent>
+#include <mainwindow.h>
+#include <QTransform>
 
 using namespace QtConcurrent;
 using namespace cv;
@@ -35,6 +38,7 @@ public:
 public slots:
     void captureImage();
     void startRecord();
+    void backToMenu();
 private:
     bool isRunning = false;
     cv::VideoCapture *cap=nullptr;
@@ -47,6 +51,7 @@ private:
     double recordHeight;
     QComboBox *recordOptions=nullptr;
     QPushButton *recordButton=nullptr;
+    QPushButton *backButton=nullptr;
     bool isRecording=false;
     string recordFileName;
     string generateFileName();
