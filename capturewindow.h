@@ -25,6 +25,12 @@
 #include <QWheelEvent>
 #include <mainwindow.h>
 #include <QTransform>
+#include <QImage>
+#include <QBrush>
+#include <QPixmap>
+#include <QGraphicsScene>
+#include <QGraphicsPixmapItem>
+#include <iostream>
 
 using namespace QtConcurrent;
 using namespace cv;

@@ -95,16 +95,15 @@ void CaptureWindow::captureImage(){
 
             this->recordFrame = new Mat(this->frame);
 
+            std::cout<<"Test"<<std::endl;
             // Show the image
             Mat dest;
             cvtColor(this->frame,dest,cv::COLOR_RGB2BGR);
-            QImage image1 = QImage((uchar *)dest.data,dest.cols,dest.rows,dest.step,QImage::Format_RGB888);
+            QImage image = QImage((uchar *)dest.data,dest.cols,dest.rows,dest.step,QImage::Format_RGB888);
 
-            //image1 = image1.scaled(int(this->imgLabel->scaleFactor*dest.cols),int(this->imgLabel->scaleFactor*dest.rows),Qt::KeepAspectRatio);
-            this->imgLabel->setPixmap(QPixmap::fromImage(image1));
-
-            std::cout<<int(this->imgLabel->scaleFactor*dest.cols)<<std::endl;
-            std::cout<<int(this->imgLabel->scaleFactor*dest.rows)<<std::endl;
+            // Create the image
+            this->imgLabel->pixmap = QPixmap::fromImage(image);
+            this->imgLabel->changeImage();
         }
     });
 }

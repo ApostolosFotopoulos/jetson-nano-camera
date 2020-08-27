@@ -1,21 +1,38 @@
 #include "capturelabel.h"
 
 
-CaptureLabel::CaptureLabel(QWidget * parent):QLabel(parent){
-    // Set minimum size for the window
-    this->setMinimumSize(QSize(960,616));
+CaptureLabel::CaptureLabel(QWidget * parent):QGraphicsView(parent){
+    this->scene = new QGraphicsScene();
 
-    // Activate the mouse tracking
-    setMouseTracking(true);
+    this->setMouseTracking(true);
 
-    // Activate scaling
-    setScaledContents(true);
+    this->setScene(scene);
+
+    this->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+
+    this->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+
+    this->setResizeAnchor(QGraphicsView::AnchorViewCenter);
+
+    this->pixmap = QPixmap(960,616);
+    this->pixmapItem = this->scene->addPixmap(pixmap);
+
+    QObject::connect(this,&CaptureLabel::refreshSignal,this,&CaptureLabel::refreshImage);
 }
 CaptureLabel::~CaptureLabel(){
+    QObject::disconnect(this,&CaptureLabel::refreshSignal,this,&CaptureLabel::refreshImage);
+}
 
+void CaptureLabel::changeImage(){
+    emit refreshSignal();
 }
 void CaptureLabel::startTheCapture(){
     emit startCaptureSignal();
+}
+
+void CaptureLabel::refreshImage(){
+    this->pixmapItem->setPixmap(this->pixmap);
+    this->update();
 }
 void CaptureLabel::wheelEvent(QWheelEvent *event){
 
@@ -24,9 +41,11 @@ void CaptureLabel::wheelEvent(QWheelEvent *event){
     this->mouseY = event->y();
 
     // Change the scale factor of the image
-    if(event->delta() > 0 && this->scaleFactor < 2.0){
+    if(event->delta() > 0){
         this->scaleFactor += 0.1;
-    } else if(event->delta() < 0 && this->scaleFactor > 1.0){
+        scale(1.2,1.2);
+    } else if(event->delta() < 0){
         this->scaleFactor -=0.1;
+        scale(0.8,0.8);
     }
 }
