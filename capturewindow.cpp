@@ -93,9 +93,53 @@ void CaptureWindow::captureImage(){
             // Capture the frame
             *this->cap >> this->frame;
 
+            //Tracking the points
+            for(int i=0;i<this->imgLabel->nPointsSet;i++){
+                //run([=](){
+                    std::cout<<"Checking: "<<i<<std::endl;
+                    // Create the mask
+                    Mat hsv;
+                    Mat mask;
+                    cvtColor(this->frame,hsv,cv::COLOR_BGR2HSV);
+                    inRange(hsv,Scalar(this->imgLabel->colorRange[i][LOWER][0],
+                            this->imgLabel->colorRange[i][LOWER][1],this->imgLabel->colorRange[i][LOWER][2]),
+                            Scalar(this->imgLabel->colorRange[i][UPPER][0],this->imgLabel->colorRange[i][UPPER][1],
+                            this->imgLabel->colorRange[i][UPPER][2]),mask);
+
+                    // Find the contours
+                    vector<vector<Point>> contours;
+                    findContours(mask.clone(),contours,RETR_EXTERNAL,CHAIN_APPROX_SIMPLE);
+
+                    // Find the largest contour
+                    double largestArea = -1;
+                    int largestContourIndex = -1;
+                    for(size_t j=0;j<contours.size();j++){
+                        double a = contourArea(contours.at(j));
+                        if(a > largestArea){
+                            largestArea = a;
+                            largestContourIndex = j;
+                        }
+                    }
+
+                    // Draw the circle and write the details
+                    if(largestArea !=-1){
+                        std::cout<<largestContourIndex<<std::endl;
+                        vector<Point> contourPoly;
+                        Point2f center;
+                        float radius;
+
+                        approxPolyDP(contours.at(largestContourIndex),contourPoly,3,true);
+                        minEnclosingCircle(contourPoly,center,radius);
+
+                        circle(this->frame,center,(int)radius,Scalar(255,255,255),2);
+                    }
+               //});
+            }
+
+
+            // Pass the frame to the record
             this->recordFrame = new Mat(this->frame);
 
-            std::cout<<"Test"<<std::endl;
             // Show the image
             Mat dest;
             cvtColor(this->frame,dest,cv::COLOR_RGB2BGR);
@@ -104,6 +148,7 @@ void CaptureWindow::captureImage(){
             // Create the image
             this->imgLabel->pixmap = QPixmap::fromImage(image);
             this->imgLabel->changeImage();
+            this->imgLabel->frame = new Mat(this->frame);
         }
     });
 }
