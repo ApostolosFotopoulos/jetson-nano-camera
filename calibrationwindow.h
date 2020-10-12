@@ -31,7 +31,6 @@ Q_OBJECT
 public:
     CalibrationWindow(QWidget *parent=nullptr);
     ~CalibrationWindow();
-    void closeEvent(QCloseEvent *event);
 public slots:
     void backToMenu();
     void captureImage();
@@ -49,6 +48,11 @@ private:
     QPushButton *pauseButton=nullptr;
     QLineEdit *input=nullptr;
     QLabel *warningLabel=nullptr;
+    QWidget *widget=nullptr;
+    QVBoxLayout *mainLayout=nullptr;
+    QHBoxLayout *buttonsLayout=nullptr;
+    QHBoxLayout *warningLayout=nullptr;
+    QHBoxLayout *imageLayout=nullptr;
     double distance(double x1,double y1,double x2,double y2);
 };
 

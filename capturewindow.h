@@ -58,6 +58,7 @@ private:
     QComboBox *recordOptions=nullptr;
     QPushButton *recordButton=nullptr;
     QPushButton *backButton=nullptr;
+    vector<Point> centerOfPoints;
     bool isRecording=false;
     string recordFileName;
     string generateFileName();

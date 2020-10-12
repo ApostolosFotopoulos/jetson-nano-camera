@@ -71,15 +71,6 @@ void CaptureLabel::mousePressEvent(QMouseEvent *event){
             this->colorRange[this->nPointsSet][UPPER][i] = int(c + ratio*c);
         }
 
-        /*
-        std::cout<<this->colorRange[this->nPointsSet][LOWER][0]<<std::endl;
-        std::cout<<this->colorRange[this->nPointsSet][LOWER][1]<<std::endl;
-        std::cout<<this->colorRange[this->nPointsSet][LOWER][2]<<std::endl;
-        std::cout<<this->colorRange[this->nPointsSet][UPPER][0]<<std::endl;
-        std::cout<<this->colorRange[this->nPointsSet][UPPER][1]<<std::endl;
-        std::cout<<this->colorRange[this->nPointsSet][UPPER][2]<<std::endl;
-
-        */
         this->nPointsSet++;
     }
 }

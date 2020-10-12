@@ -95,8 +95,8 @@ void CaptureWindow::captureImage(){
 
             //Tracking the points
             for(int i=0;i<this->imgLabel->nPointsSet;i++){
-                //run([=](){
                     std::cout<<"Checking: "<<i<<std::endl;
+
                     // Create the mask
                     Mat hsv;
                     Mat mask;
@@ -130,10 +130,11 @@ void CaptureWindow::captureImage(){
 
                         approxPolyDP(contours.at(largestContourIndex),contourPoly,3,true);
                         minEnclosingCircle(contourPoly,center,radius);
-
+                        std::cout<<this->centerOfPoints.size()<<std::endl;
+                        
+                        
                         circle(this->frame,center,(int)radius,Scalar(255,255,255),2);
                     }
-               //});
             }
 
 

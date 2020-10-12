@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
+
+    this->parent = parent;
     // Title of the window
     this->setWindowTitle("Multimedia Player");
 
@@ -76,24 +78,16 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
     // Set the main layout to window
     this->setCentralWidget(widget);
     widget->setLayout(mainLayout);
+    this->setAttribute(Qt::WA_DeleteOnClose);
 }
 
 MainWindow::~MainWindow(){
-
-    // Terminate the loop for update
-    this->isRunning = false;
-
-    // Clean the events
-    QObject::disconnect(this->imgLabel,&ImageLabel::startCaptureSignal,this,&MainWindow::captureImage);
-    QObject::disconnect(this->newOriginButton,&QPushButton::clicked,this,&MainWindow::goToNewOrigin);
-    QObject::disconnect(this->mainButton,&QPushButton::clicked,this,&MainWindow::goToCapture);
-    QObject::disconnect(this->calButton,&QPushButton::clicked,this,&MainWindow::goToCalibration);
-    QObject::disconnect(this->playerButton,&QPushButton::clicked,this,&MainWindow::goToPlayer);
-
+    std::cout<<"Hello"<<std::endl;
 }
 
 void MainWindow::captureImage(){
     run([=](){
+
         while(this->isRunning){
             // Capture the frame
             *this->cap >> this->frame;
@@ -156,17 +150,15 @@ void MainWindow::goToNewOrigin(){
     this->close();
 }
 void MainWindow::goToCapture(){
-    std::cout<<"Capture"<<std::endl;
-    this->hide();
+    std::cout<<"Capture Qq"<<std::endl;
+    CaptureWindow *w = new CaptureWindow();
     this->isRunning=false;
     this->cap->release();
-    CaptureWindow *w = new CaptureWindow();
     w->show();
     this->close();
 }
 void MainWindow::goToCalibration(){
     std::cout<<"Calibration"<<std::endl;
-    this->hide();
     this->isRunning=false;
     this->cap->release();
     CalibrationWindow *w = new CalibrationWindow();
@@ -182,12 +174,7 @@ void MainWindow::goToPlayer(){
     w->show();
     this->close();
 }
-void MainWindow::closeEvent(QCloseEvent *event){
-    if(event->spontaneous()){
-        this->isRunning=false;
-        this->cap->release();
-        QCoreApplication::quit();
-    }
-    event->accept();
-}
+void MainWindow::showEvent(QShowEvent *event){
+    std::cout<<"Window created"<<std::endl;
 
+}

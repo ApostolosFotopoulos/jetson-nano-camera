@@ -30,6 +30,7 @@
 #include <QCoreApplication>
 #include <calibrationwindow.h>
 #include <player.h>
+#include <QShowEvent>
 #include <capturewindow.h>
 
 using namespace QtConcurrent;
@@ -48,8 +49,8 @@ public slots:
     void goToCapture();
     void goToCalibration();
     void goToPlayer();
-    void closeEvent(QCloseEvent *event);
 private:
+    QWidget *parent;
     QPushButton *newOriginButton=nullptr;
     QPushButton *mainButton=nullptr;
     QPushButton *calButton=nullptr;
@@ -60,5 +61,6 @@ private:
     cv::Mat frame;
     int originX;
     int originY;
+    void showEvent(QShowEvent *event);
 };
 #endif // MAINWINDOW_H

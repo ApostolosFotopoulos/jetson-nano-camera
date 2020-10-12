@@ -5,7 +5,9 @@ CalibrationLabel::CalibrationLabel(QWidget *parent):QLabel(parent){
     this->setMinimumSize(QSize(960,616));
 }
 CalibrationLabel::~CalibrationLabel(){
-
+    // Delete the pointers
+    delete this->p1;
+    delete this->p2;
 }
 void CalibrationLabel::startTheCapture(){
     emit startCaptureSignal();

@@ -9,11 +9,11 @@ CalibrationWindow::CalibrationWindow(QWidget * parent):QMainWindow(parent){
     this->setStyleSheet("font-size:15px;background-color:#383838;color:#fff");
 
     // Create the widget for the window
-    QWidget *widget = new QWidget(this);
+    this->widget = new QWidget(this);
 
     // Create the main layout
-    QVBoxLayout *mainLayout = new QVBoxLayout(widget);
-    mainLayout->setAlignment(Qt::AlignVCenter);
+    this->mainLayout = new QVBoxLayout(this->widget);
+    this->mainLayout->setAlignment(Qt::AlignVCenter);
 
     // Set the capture
     Camera c;
@@ -26,24 +26,24 @@ CalibrationWindow::CalibrationWindow(QWidget * parent):QMainWindow(parent){
     this->isRunning = true;
 
     //Create the buttons layout
-    QHBoxLayout *buttonsLayout = new QHBoxLayout();
-    buttonsLayout->setAlignment(Qt::AlignCenter);
-    mainLayout->addLayout(buttonsLayout,Qt::AlignBottom);
+    this->buttonsLayout = new QHBoxLayout();
+    this->buttonsLayout->setAlignment(Qt::AlignCenter);
+    this->mainLayout->addLayout(this->buttonsLayout,Qt::AlignBottom);
 
      // Create the buttons and the input
     this->backButton = new QPushButton("Back");
-    buttonsLayout->addWidget(this->backButton);
+    this->buttonsLayout->addWidget(this->backButton);
 
     // Input
     this->input = new QLineEdit();
     this->input->setPlaceholderText("Enter the cm for the distance...");
-    buttonsLayout->addWidget(this->input);
+    this->buttonsLayout->addWidget(this->input);
 
     this->pauseButton = new QPushButton("Pause");
-    buttonsLayout->addWidget(this->pauseButton);
+    this->buttonsLayout->addWidget(this->pauseButton);
 
     this->calButton = new QPushButton("Calibrate");
-    buttonsLayout->addWidget(this->calButton);
+    this->buttonsLayout->addWidget(this->calButton);
 
     // Button events
     QObject::connect(this->backButton,&QPushButton::clicked,this,&CalibrationWindow::backToMenu);
@@ -51,31 +51,35 @@ CalibrationWindow::CalibrationWindow(QWidget * parent):QMainWindow(parent){
     QObject::connect(this->pauseButton,&QPushButton::clicked,this,&CalibrationWindow::pause);
 
     //Create the warning layout
-    QHBoxLayout *warningLayout = new QHBoxLayout();
-    warningLayout->setAlignment(Qt::AlignCenter);
-    mainLayout->addLayout(warningLayout,Qt::AlignBottom);
+    this->warningLayout = new QHBoxLayout();
+    this->warningLayout->setAlignment(Qt::AlignCenter);
+    this->mainLayout->addLayout(this->warningLayout,Qt::AlignBottom);
 
     // Create the warning label
     this->warningLabel = new QLabel();
     this->warningLabel->setStyleSheet("color:red;");
     this->warningLabel->setText("");
-    warningLayout->addWidget(this->warningLabel);
+    this->warningLayout->addWidget(this->warningLabel);
 
     // Create the clickable label for the origin
     this->imgLabel = new CalibrationLabel();
-    QHBoxLayout *imageLayout = new QHBoxLayout();
-    imageLayout->addWidget(this->imgLabel);
-    imageLayout->setAlignment(Qt::AlignCenter);
-    mainLayout->addLayout(imageLayout);
+    this->imageLayout = new QHBoxLayout();
+    this->imageLayout->addWidget(this->imgLabel);
+    this->imageLayout->setAlignment(Qt::AlignCenter);
+    this->mainLayout->addLayout(this->imageLayout);
     QObject::connect(this->imgLabel,&CalibrationLabel::startCaptureSignal,this,&CalibrationWindow::captureImage);
     QObject::connect(this->imgLabel,&CalibrationLabel::newPointClicked,this,&CalibrationWindow::renderPoint);
     this->imgLabel->startTheCapture();
 
     // Set the main layout to window
-    this->setCentralWidget(widget);
-    widget->setLayout(mainLayout);
+    this->setCentralWidget(this->widget);
+    this->widget->setLayout(this->mainLayout);
+
+    // Set delete on close
+    this->setAttribute(Qt::WA_DeleteOnClose);
 }
 CalibrationWindow::~CalibrationWindow(){
+    std::cout<<"Removing resources"<<std::endl;
     // Stop the capturing
     this->isRunning = false;
 
@@ -86,6 +90,19 @@ CalibrationWindow::~CalibrationWindow(){
     QObject::disconnect(this->pauseButton,&QPushButton::clicked,this,&CalibrationWindow::pause);
     QObject::disconnect(this->imgLabel,&CalibrationLabel::newPointClicked,this,&CalibrationWindow::renderPoint);
 
+    // Delete the pointers
+    delete this->cap;
+    delete this->imgLabel;
+    delete this->backButton;
+    delete this->calButton;
+    delete this->pauseButton;
+    delete this->input;
+    delete this->warningLabel;
+    delete this->buttonsLayout;
+    delete this->warningLayout;
+    delete this->imageLayout;
+    delete this->mainLayout;
+    //delete this->widget;
 }
 void CalibrationWindow::captureImage(){
     run([=](){
@@ -107,9 +124,9 @@ void CalibrationWindow::backToMenu(){
     this->hide();
     this->isRunning =false;
     this->cap->release();
-    MainWindow *w = new MainWindow();
+    MainWindow *w = new MainWindow(this);
     w->show();
-    this->close();
+    //this->close();
 }
 bool isNumeric(string str){
     for(unsigned int i=0;i<str.length();i++){
@@ -224,12 +241,4 @@ void CalibrationWindow::renderPoint(){
     cvtColor(this->frame,dest,cv::COLOR_RGB2BGR);
     QImage image1 = QImage((uchar *)dest.data,dest.cols,dest.rows,dest.step,QImage::Format_RGB888);
     this->imgLabel->setPixmap(QPixmap::fromImage(image1));
-}
-void CalibrationWindow::closeEvent(QCloseEvent *event){
-    if(event->spontaneous()){
-        this->isRunning=false;
-        this->cap->release();
-        QCoreApplication::quit();
-    }
-    event->accept();
 }
