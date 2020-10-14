@@ -27,6 +27,14 @@ MainWindow::MainWindow() : QMainWindow(){
     // Create the widget for the window
     this->widget = new LaunchWidget(this);
 
+    // Read the json properties
+    this->readJSONProperties();
+
+    // Capture event
+    this->isRunning = true;
+    QObject::connect(this,&MainWindow::startCaptureSignal,this,&MainWindow::captureImage);
+    this->startCapturingEvent();
+
     // Set the main layout to window
     this->setCentralWidget(widget);
 }
@@ -35,6 +43,7 @@ MainWindow::~MainWindow(){
     #ifdef LOG
     std::cout<<"MainWindow destroyed..."<<std::endl;
     #endif
+    this->isRunning = false;
 }
 void MainWindow::goToCapture(){
 
@@ -110,5 +119,53 @@ void MainWindow::backToLaunch(){
     // Create the new widget and show the window then
     this->widget = new LaunchWidget(this);
     this->setCentralWidget(this->widget);
+
+    // Read the json properties
+    this->readJSONProperties();
     this->show();
+}
+
+void MainWindow::readJSONProperties(){
+    #ifdef LOG
+    std::cout<<"Reading the JSON...."<<std::endl;
+    #endif
+
+    // Try to open the file if exist then continue to reading it
+    QFile file_obj(":/config/params.json");
+    if(!file_obj.open(QIODevice::ReadOnly)){
+        std::cout<<"[ERROR] Failed to open params.json"<<std::endl;
+        exit(1);
+    }
+
+    // Read the content
+    QTextStream file_text(&file_obj);
+    QString json_string;
+    json_string = file_text.readAll();
+    file_obj.close();
+
+    // Pass the content from json format to qvariant
+    QByteArray json_bytes = json_string.toLocal8Bit();
+    auto json_doc=QJsonDocument::fromJson(json_bytes);
+    QJsonObject json_obj=json_doc.object();
+    QVariantMap json_map = json_obj.toVariantMap();
+
+    // Setup the parameters
+    this->originX = json_map["originX"].toInt();
+    this->originY = json_map["originY"].toInt();
+    this->distance = json_map["distance"].toInt();
+
+    #ifdef LOG
+    std::cout<<json_string.toLocal8Bit().constData()<<std::endl;
+    #endif
+}
+
+void MainWindow::captureImage(){
+    run([=](){
+        while(this->isRunning){
+
+        }
+    });
+}
+void MainWindow::startCapturingEvent(){
+    emit startCaptureSignal();
 }
