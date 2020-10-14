@@ -24,15 +24,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    calibrationwidget.cpp \
+    capturewidget.cpp \
         main.cpp \
         mainwindow.cpp \
     launchwidget.cpp \
-    camera.cpp
+    camera.cpp \
+    neworiginwidget.cpp \
+    playerwidget.cpp
 
 HEADERS += \
+    calibrationwidget.h \
+    capturewidget.h \
         mainwindow.h \
     launchwidget.h \
-    camera.h
+    camera.h \
+    neworiginwidget.h \
+    playerwidget.h
 
 INCLUDEPATH += /usr/include/opencv4
-LIBS += -L/usr/lib `pkg-config --libs opencv` -L/usr/include/opencv4 -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lm
+#LIBS += -L/usr/lib `pkg-config --libs opencv` -L/usr/include/opencv4 -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lm
