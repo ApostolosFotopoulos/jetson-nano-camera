@@ -9,6 +9,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <iostream>
+#include <QPushButton>
 
 class CalibrationWidget:public QWidget{
 Q_OBJECT
@@ -18,6 +19,8 @@ public:
     ~CalibrationWidget();
 private:
     QMainWindow *parent=nullptr;
+    QPushButton *backButton=nullptr;
+    QLabel *imgLabel=nullptr;
 };
 
 #endif // CALIBRATIONWIDGET_H

@@ -9,14 +9,28 @@ CalibrationWidget::CalibrationWidget(QMainWindow*parent):QWidget(){
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setAlignment(Qt::AlignVCenter);
 
-    QLabel *label = new QLabel("Calibration");
-    QHBoxLayout *labelLayout = new QHBoxLayout();
-    labelLayout->addWidget(label);
-    labelLayout->setAlignment(Qt::AlignCenter);
-    mainLayout->addLayout(labelLayout);
+    // -------------------------- Create the buttons layout --------------------------//
+    QHBoxLayout *buttonsLayout = new QHBoxLayout();
+    buttonsLayout->setAlignment(Qt::AlignTop);
+    mainLayout->addLayout(buttonsLayout,Qt::AlignTop);
 
+    // -------------------------- Create the buttons --------------------------//
 
-    this->setMinimumSize(QSize(960,616));
+    //- origin
+    this->backButton = new QPushButton("Back");
+    buttonsLayout->addWidget(this->backButton);
+    this->backButton->setStyleSheet("background-color:#686868;");
+
+    // Button events
+    QObject::connect(this->backButton,SIGNAL(clicked()),this->parent,SLOT(backToLaunch()));
+
+    //Create a clickable label for the origin
+    this->imgLabel = new QLabel("Image");
+    QHBoxLayout *imageLayout = new QHBoxLayout();
+    imageLayout->addWidget(this->imgLabel);
+    imageLayout->setAlignment(Qt::AlignCenter);
+    mainLayout->addLayout(imageLayout,Qt::AlignCenter);
+
     this->setLayout(mainLayout);
     this->setAttribute(Qt::WA_DeleteOnClose);
 }
