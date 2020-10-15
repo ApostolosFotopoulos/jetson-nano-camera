@@ -31,7 +31,10 @@ SOURCES += \
     launchwidget.cpp \
     camera.cpp \
     neworiginwidget.cpp \
-    playerwidget.cpp
+    playercontrols.cpp \
+    playerwidget.cpp \
+    rangeslider.cpp \
+    video.cpp
 
 HEADERS += \
     calibrationwidget.h \
@@ -40,10 +43,14 @@ HEADERS += \
     launchwidget.h \
     camera.h \
     neworiginwidget.h \
-    playerwidget.h
+    playercontrols.h \
+    playerwidget.h \
+    rangeslider.h \
+    video.h
 
 INCLUDEPATH += /usr/include/opencv4
 #LIBS += -L/usr/lib `pkg-config --libs opencv` -L/usr/include/opencv4 -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lm
 
 RESOURCES += \
+    resources.qrc \
     resources.qrc
