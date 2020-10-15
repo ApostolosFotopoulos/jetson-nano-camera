@@ -16,14 +16,24 @@ NewOriginWidget::NewOriginWidget(QMainWindow *parent):QWidget(){
     // -------------------------- Create the buttons --------------------------//
 
     //- origin
-    this->backButton = new QPushButton("Back to menu");
+    this->backButton = new QPushButton("Back");
     buttonsLayout->addWidget(this->backButton);
     this->backButton->setStyleSheet("background-color:#686868;");
 
     // Button events
     QObject::connect(this->backButton,SIGNAL(clicked()),this->parent,SLOT(backToLaunch()));
 
-    this->setMinimumSize(QSize(960,616));
+    //Create a clickable label for the origin
+    this->imgLabel = new QLabel("Image");
+    QHBoxLayout *imageLayout = new QHBoxLayout();
+    imageLayout->addWidget(this->imgLabel);
+    imageLayout->setAlignment(Qt::AlignCenter);
+    mainLayout->addLayout(imageLayout,Qt::AlignCenter);
+
+    // Capture image
+    this->isRunning = true;
+    this->captureImage();
+
     this->setLayout(mainLayout);
     this->setAttribute(Qt::WA_DeleteOnClose);
 }
@@ -31,4 +41,15 @@ NewOriginWidget::~NewOriginWidget(){
     #ifdef LOG
     std::cout<<"NewOrigin destroyed...."<<std::endl;
     #endif
+
+    this->isRunning = false;
+}
+void NewOriginWidget::captureImage(){
+    run([=](){
+        while(this->isRunning){
+
+            // Capture the frame
+
+        }
+    });
 }

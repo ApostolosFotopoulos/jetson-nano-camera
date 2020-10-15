@@ -11,6 +11,11 @@
 #include <iostream>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QFuture>
+#include <QtConcurrent>
+
+
+using namespace QtConcurrent;
 
 class NewOriginWidget:public QWidget{
 Q_OBJECT
@@ -18,9 +23,14 @@ Q_OBJECT
 public:
     NewOriginWidget(QMainWindow *parent);
     ~NewOriginWidget();
+public:
+    bool isRunning = false;
 private:
     QMainWindow *parent=nullptr;
     QPushButton *backButton=nullptr;
+    QLabel *imgLabel=nullptr;
+private:
+    void captureImage();
 };
 
 #endif // NEWORIGINWIDGET_H
