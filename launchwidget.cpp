@@ -59,7 +59,6 @@ LaunchWidget::LaunchWidget(QMainWindow *parent):QWidget(){
     labelLayout->setAlignment(Qt::AlignCenter);
     mainLayout->addLayout(labelLayout,Qt::AlignBottom);
 
-    this->setMinimumSize(QSize(960,616));
     this->setLayout(mainLayout);
     this->setAttribute(Qt::WA_DeleteOnClose);
 }
