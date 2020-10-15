@@ -16,6 +16,7 @@
 #include <QJsonObject>
 #include <QFuture>
 #include <QtConcurrent>
+#include <QSizePolicy>
 
 /*
 #include <opencv2/core/core.hpp>
@@ -34,17 +35,12 @@ Q_OBJECT
 public:
     MainWindow();
     ~MainWindow();
-signals:
-    void startCaptureSignal();
 public slots:
     void goToNewOrigin();
     void goToCapture();
     void goToCalibration();
     void goToPlayer();
     void backToLaunch();
-    void captureImage();
-public:
-    bool isRunning = false;
 private:
     QWidget *widget=nullptr;
     int originX = 0;
@@ -53,7 +49,6 @@ private:
     //cv::VideoCapture *cap=nullptr;
 private:
     void readJSONProperties();
-    void startCapturingEvent();
 };
 
 #endif // MAINWINDOW_H

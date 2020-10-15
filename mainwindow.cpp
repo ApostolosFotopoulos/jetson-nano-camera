@@ -30,10 +30,7 @@ MainWindow::MainWindow() : QMainWindow(){
     // Read the json properties
     this->readJSONProperties();
 
-    // Capture event
-    this->isRunning = true;
-    QObject::connect(this,&MainWindow::startCaptureSignal,this,&MainWindow::captureImage);
-    this->startCapturingEvent();
+    this->setMinimumSize(QSize(960,616));
 
     // Set the main layout to window
     this->setCentralWidget(widget);
@@ -157,15 +154,4 @@ void MainWindow::readJSONProperties(){
     #ifdef LOG
     std::cout<<json_string.toLocal8Bit().constData()<<std::endl;
     #endif
-}
-
-void MainWindow::captureImage(){
-    run([=](){
-        while(this->isRunning){
-
-        }
-    });
-}
-void MainWindow::startCapturingEvent(){
-    emit startCaptureSignal();
 }
