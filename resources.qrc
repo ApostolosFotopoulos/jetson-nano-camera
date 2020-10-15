@@ -1,5 +1,13 @@
 <RCC>
+    <qresource prefix="/"/>
     <qresource prefix="/config">
         <file>params.json</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file>next.svg</file>
+        <file>pause.svg</file>
+        <file>play.svg</file>
+        <file>return.svg</file>
+        <file>stop.svg</file>
     </qresource>
 </RCC>
