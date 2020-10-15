@@ -15,7 +15,6 @@ CaptureWidget::CaptureWidget(QMainWindow *parent):QWidget(){
     labelLayout->setAlignment(Qt::AlignCenter);
     mainLayout->addLayout(labelLayout);
 
-    this->setMinimumSize(QSize(960,616));
     this->setLayout(mainLayout);
     this->setAttribute(Qt::WA_DeleteOnClose);
 }
