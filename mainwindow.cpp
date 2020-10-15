@@ -40,7 +40,6 @@ MainWindow::~MainWindow(){
     #ifdef LOG
     std::cout<<"MainWindow destroyed..."<<std::endl;
     #endif
-    this->isRunning = false;
 }
 void MainWindow::goToCapture(){
 
