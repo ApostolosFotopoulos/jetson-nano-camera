@@ -41,8 +41,8 @@ void OriginLabel::mousePressEvent(QMouseEvent *event){
     QByteArray json_bytes = json_string.toLocal8Bit();
     auto json_doc = QJsonDocument::fromJson(json_bytes);
     auto json_obj = json_doc.object();
-    json_obj["originX"] = x;
-    json_obj["originY"] = y;
+    json_obj["originX"] = *(this->originX);
+    json_obj["originY"] = *(this->originY);
 
     // Parse the object to bytes
     QJsonDocument json_doc_after(json_obj);

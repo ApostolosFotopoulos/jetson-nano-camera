@@ -114,12 +114,13 @@ void MainWindow::backToLaunch(){
     this->hide();
     this->setWindowTitle("Multimedia Player");
 
+    // Read the json properties
+    this->readJSONProperties();
+
     // Create the new widget and show the window then
     this->widget = new LaunchWidget(this,this->originX,this->originY,this->distance);
     this->setCentralWidget(this->widget);
 
-    // Read the json properties
-    this->readJSONProperties();
     this->show();
 }
 
