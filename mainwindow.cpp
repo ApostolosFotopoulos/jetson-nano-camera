@@ -12,6 +12,7 @@ MainWindow::MainWindow() : QMainWindow(){
     Camera c;
 
     this->cap = new VideoCapture(c.stream(),CAP_GSTREAMER);
+    //this->cap = new VideoCapture(1);
     if(!this->cap->isOpened()){
         std::cout<<"Exited"<<std::endl;
         exit(1);
@@ -54,6 +55,8 @@ void MainWindow::goToCapture(){
     this->setWindowTitle("Capture/Record");
 
     // Create the new widget and show the window then
+    this->setCentralWidget(nullptr);
+    delete this->widget;
     this->widget = new CaptureWidget(this);
     this->setCentralWidget(this->widget);
     this->show();
@@ -70,6 +73,8 @@ void MainWindow::goToCalibration(){
     this->setWindowTitle("Calibration Setup");
 
     // Create the new widget and show the window then
+    this->setCentralWidget(nullptr);
+    delete this->widget;
     this->widget = new CalibrationWidget(this);
     this->setCentralWidget(this->widget);
     this->show();
@@ -85,6 +90,8 @@ void MainWindow::goToNewOrigin(){
     this->setWindowTitle("Choose Origin");
 
     // Create the new widget and show the window then
+    this->setCentralWidget(nullptr);
+    delete this->widget;
     this->widget = new NewOriginWidget(this,this->originX,this->originY,this->distance);
     this->setCentralWidget(this->widget);
     this->show();
@@ -100,6 +107,8 @@ void MainWindow::goToPlayer(){
     this->setWindowTitle("Video Player");
 
     // Create the new widget and show the window then
+    this->setCentralWidget(nullptr);
+    delete this->widget;
     this->widget = new PlayerWidget(this);
     this->setCentralWidget(this->widget);
     this->show();
@@ -118,6 +127,8 @@ void MainWindow::backToLaunch(){
     this->readJSONProperties();
 
     // Create the new widget and show the window then
+    this->setCentralWidget(nullptr);
+    delete this->widget;
     this->widget = new LaunchWidget(this,this->originX,this->originY,this->distance);
     this->setCentralWidget(this->widget);
 
@@ -191,7 +202,9 @@ void MainWindow::captureImage(){
    run([=](){
        while(this->isRunning && this->cap){
            // Capture the frame
-           this->frame = new Mat();
+           if(!this->frame){
+             this->frame = new Mat();
+           }
            *this->cap >> *this->frame;
            emit updateImageSignal(this->frame);
        }
