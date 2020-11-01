@@ -1,8 +1,11 @@
 #include "neworiginwidget.h"
 
-NewOriginWidget::NewOriginWidget(QMainWindow *parent):QWidget(){
+NewOriginWidget::NewOriginWidget(QMainWindow *parent,int originX,int originY,int distance):QWidget(){
     // -------------------------- Setup the parent variable --------------------------//
     this->parent = parent;
+    this->originX = originX;
+    this->originY = originY;
+    this->distance = distance;
 
     // -------------------------- Create the main layout --------------------------//
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -24,15 +27,13 @@ NewOriginWidget::NewOriginWidget(QMainWindow *parent):QWidget(){
     QObject::connect(this->backButton,SIGNAL(clicked()),this->parent,SLOT(backToLaunch()));
 
     //Create a clickable label for the origin
-    this->imgLabel = new QLabel("Image");
+    this->imgLabel = new OriginLabel(&this->originX,&this->originY);
     QHBoxLayout *imageLayout = new QHBoxLayout();
     imageLayout->addWidget(this->imgLabel);
     imageLayout->setAlignment(Qt::AlignCenter);
     mainLayout->addLayout(imageLayout,Qt::AlignCenter);
 
-    // Capture image
-    this->isRunning = true;
-    this->captureImage();
+    QObject::connect(this->parent,SIGNAL(updateImageSignal(cv::Mat*)),this,SLOT(updateImage(cv::Mat *)));
 
     this->setLayout(mainLayout);
     this->setAttribute(Qt::WA_DeleteOnClose);
@@ -44,12 +45,22 @@ NewOriginWidget::~NewOriginWidget(){
 
     this->isRunning = false;
 }
-void NewOriginWidget::captureImage(){
-    run([=](){
-        while(this->isRunning){
+void NewOriginWidget::updateImage(cv::Mat *frame){
 
-            // Capture the frame
+    // Get height and width
+    int width = (*frame).size().width;
+    int height = (*frame).size().height;
 
-        }
-    });
+    // Horizontal line
+    line(*frame,Point(this->originX,this->originY),Point(this->originX+width,this->originY),Scalar(0,0,255),2);
+    line(*frame,Point(this->originX,this->originY),Point(this->originX-width,this->originY),Scalar(0,0,255),2);
+
+    // Vertical line
+    line(*frame,Point(this->originX,this->originY),Point(this->originX,this->originY+height),Scalar(0,0,255),2);
+    line(*frame,Point(this->originX,this->originY),Point(this->originX,this->originY-height),Scalar(0,0,255),2);
+
+    Mat dest;
+    cvtColor(*frame,dest,cv::COLOR_RGB2BGR);
+    QImage i = QImage((uchar *)dest.data,dest.cols,dest.rows,dest.step,QImage::Format_RGB888);
+    this->imgLabel->setPixmap(QPixmap::fromImage(i));
 }

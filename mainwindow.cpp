@@ -9,9 +9,7 @@ MainWindow::MainWindow() : QMainWindow(){
     this->setStyleSheet("font-size:15px;background-color:#383838;color:#fff");
 
     // Initialize the capture
-    //Camera c;
-
-    /*
+    Camera c;
 
     this->cap = new VideoCapture(c.stream(),CAP_GSTREAMER);
     if(!this->cap->isOpened()){
@@ -19,16 +17,19 @@ MainWindow::MainWindow() : QMainWindow(){
         exit(1);
     }
     std::cout<<"[INFO] Starting the camera...."<<std::endl;
+    this->isRunning=true;
 
-    #endif
+    QObject::connect(this,SIGNAL(startCaptureSignal()),this,SLOT(captureImage()));
+    emit startCaptureSignal();
 
-    */
-
-    // Create the widget for the window
-    this->widget = new LaunchWidget(this);
+    // Create a json with the params if doesn't exist
+    this->createJSON();
 
     // Read the json properties
     this->readJSONProperties();
+
+    // Create the widget for the window
+    this->widget = new LaunchWidget(this,this->originX,this->originY,this->distance);
 
     this->setMinimumSize(QSize(960,616));
 
@@ -40,6 +41,7 @@ MainWindow::~MainWindow(){
     #ifdef LOG
     std::cout<<"MainWindow destroyed..."<<std::endl;
     #endif
+    this->isRunning = false;
 }
 void MainWindow::goToCapture(){
 
@@ -83,7 +85,7 @@ void MainWindow::goToNewOrigin(){
     this->setWindowTitle("Choose Origin");
 
     // Create the new widget and show the window then
-    this->widget = new NewOriginWidget(this);
+    this->widget = new NewOriginWidget(this,this->originX,this->originY,this->distance);
     this->setCentralWidget(this->widget);
     this->show();
 }
@@ -113,7 +115,7 @@ void MainWindow::backToLaunch(){
     this->setWindowTitle("Multimedia Player");
 
     // Create the new widget and show the window then
-    this->widget = new LaunchWidget(this);
+    this->widget = new LaunchWidget(this,this->originX,this->originY,this->distance);
     this->setCentralWidget(this->widget);
 
     // Read the json properties
@@ -121,13 +123,43 @@ void MainWindow::backToLaunch(){
     this->show();
 }
 
+void MainWindow::createJSON(){
+
+    // Check if the file exists otherwise create a file
+    QFile file_obj("./params.json");
+    if(!file_obj.exists()){
+        std::cout<<"File Doesn't exist..."<<std::endl;
+
+        // Initialize the file
+        QString json_string;
+        QByteArray json_bytes = json_string.toLocal8Bit();
+        auto json_doc = QJsonDocument::fromJson(json_bytes);
+        auto json_obj = json_doc.object();
+        json_obj["originX"] = 480;
+        json_obj["originY"] = 308;
+        json_obj["distance"] = 0;
+
+        // Parse object to bytes
+        QJsonDocument json_doc_after(json_obj);
+        json_string = json_doc_after.toJson();
+
+        // Save the file
+        QFile save_file("./params.json");
+        if(!save_file.open(QIODevice::WriteOnly)){
+            std::cout<<"Failed to write"<<std::endl;
+            exit(1);
+        }
+        save_file.write(json_string.toLocal8Bit());
+        save_file.close();
+    }
+}
 void MainWindow::readJSONProperties(){
     #ifdef LOG
     std::cout<<"Reading the JSON...."<<std::endl;
     #endif
 
     // Try to open the file if exist then continue to reading it
-    QFile file_obj(":/config/params.json");
+    QFile file_obj("./params.json");
     if(!file_obj.open(QIODevice::ReadOnly)){
         std::cout<<"[ERROR] Failed to open params.json"<<std::endl;
         exit(1);
@@ -153,4 +185,14 @@ void MainWindow::readJSONProperties(){
     #ifdef LOG
     std::cout<<json_string.toLocal8Bit().constData()<<std::endl;
     #endif
+}
+void MainWindow::captureImage(){
+   run([=](){
+       while(this->isRunning && this->cap){
+           // Capture the frame
+           this->frame = new Mat();
+           *this->cap >> *this->frame;
+           emit updateImageSignal(this->frame);
+       }
+   });
 }

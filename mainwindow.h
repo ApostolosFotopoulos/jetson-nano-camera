@@ -17,15 +17,13 @@
 #include <QFuture>
 #include <QtConcurrent>
 #include <QSizePolicy>
-
-/*
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-*/
-//using namespace cv;
+
+using namespace cv;
 
 using namespace QtConcurrent;
 
@@ -35,20 +33,28 @@ Q_OBJECT
 public:
     MainWindow();
     ~MainWindow();
+signals:
+    void startCaptureSignal();
+    void updateImageSignal(cv::Mat *frame);
 public slots:
     void goToNewOrigin();
     void goToCapture();
     void goToCalibration();
     void goToPlayer();
     void backToLaunch();
-private:
-    QWidget *widget=nullptr;
+    void captureImage();
+public:
+    cv::VideoCapture *cap=nullptr;
+    cv::Mat *frame=nullptr;
     int originX = 0;
     int originY = 0;
     int distance = 0;
-    //cv::VideoCapture *cap=nullptr;
+private:
+    QWidget *widget=nullptr;
+    bool isRunning = false;
 private:
     void readJSONProperties();
+    void createJSON();
 };
 
 #endif // MAINWINDOW_H

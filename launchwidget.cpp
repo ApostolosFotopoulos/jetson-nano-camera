@@ -1,10 +1,12 @@
 #include "launchwidget.h"
 
-LaunchWidget::LaunchWidget(QMainWindow *parent):QWidget(){
+LaunchWidget::LaunchWidget(QMainWindow *parent,int originX,int originY,int distance):QWidget(){
 
     // -------------------------- Setup the parent variable --------------------------//
     this->parent = parent;
-
+    this->originX = originX;
+    this->originY = originY;
+    this->distance = distance;
     // -------------------------- Create the main layout --------------------------//
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setAlignment(Qt::AlignVCenter);
@@ -49,8 +51,7 @@ LaunchWidget::LaunchWidget(QMainWindow *parent):QWidget(){
     imageLayout->setAlignment(Qt::AlignCenter);
     mainLayout->addLayout(imageLayout,Qt::AlignCenter);
 
-
-    // Update the image
+    QObject::connect(this->parent,SIGNAL(updateImageSignal(cv::Mat*)),this,SLOT(updateImage(cv::Mat *)));
 
     // -------------------------- Create the down label --------------------------//
     QLabel *label = new QLabel("Do you agree with the below origin?");
@@ -67,3 +68,23 @@ LaunchWidget::~LaunchWidget(){
     std::cout<<"LaunchWidget destroyed..."<<std::endl;
     #endif
 }
+void LaunchWidget::updateImage(cv::Mat *frame){
+
+    // Get height and width
+    int width = (*frame).size().width;
+    int height = (*frame).size().height;
+
+    // Horizontal line
+    line(*frame,Point(this->originX,this->originY),Point(this->originX+width,this->originY),Scalar(0,0,255),2);
+    line(*frame,Point(this->originX,this->originY),Point(this->originX-width,this->originY),Scalar(0,0,255),2);
+
+    // Vertical line
+    line(*frame,Point(this->originX,this->originY),Point(this->originX,this->originY+height),Scalar(0,0,255),2);
+    line(*frame,Point(this->originX,this->originY),Point(this->originX,this->originY-height),Scalar(0,0,255),2);
+
+    Mat dest;
+    cvtColor(*frame,dest,cv::COLOR_RGB2BGR);
+    QImage i = QImage((uchar *)dest.data,dest.cols,dest.rows,dest.step,QImage::Format_RGB888);
+    this->imgLabel->setPixmap(QPixmap::fromImage(i));
+}
+
