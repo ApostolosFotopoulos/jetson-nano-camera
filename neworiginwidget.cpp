@@ -42,8 +42,6 @@ NewOriginWidget::~NewOriginWidget(){
     #ifdef LOG
     std::cout<<"NewOrigin destroyed...."<<std::endl;
     #endif
-
-    this->isRunning = false;
 }
 void NewOriginWidget::updateImage(cv::Mat *frame){
 

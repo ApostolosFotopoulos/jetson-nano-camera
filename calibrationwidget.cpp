@@ -6,36 +6,59 @@ CalibrationWidget::CalibrationWidget(QMainWindow*parent):QWidget(){
     this->parent = parent;
 
     // -------------------------- Create the main layout --------------------------//
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setAlignment(Qt::AlignVCenter);
+    this->mainLayout = new QVBoxLayout(this);
+    this->mainLayout->setAlignment(Qt::AlignVCenter);
 
     // -------------------------- Create the buttons layout --------------------------//
-    QHBoxLayout *buttonsLayout = new QHBoxLayout();
-    buttonsLayout->setAlignment(Qt::AlignTop);
-    mainLayout->addLayout(buttonsLayout,Qt::AlignTop);
+    this->buttonsLayout = new QHBoxLayout();
+    this->buttonsLayout->setAlignment(Qt::AlignTop);
+    this->mainLayout->addLayout(this->buttonsLayout,Qt::AlignTop);
 
     // -------------------------- Create the buttons --------------------------//
 
-    //- origin
+    //Back to origin
     this->backButton = new QPushButton("Back");
-    buttonsLayout->addWidget(this->backButton);
+    this->buttonsLayout->addWidget(this->backButton);
     this->backButton->setStyleSheet("background-color:#686868;");
+
+    // Input for the distance
+    this->input = new QLineEdit();
+    this->input->setPlaceholderText("Enter the cm for the distance...");
+    this->buttonsLayout->addWidget(this->input);
+
+    // Pause button for the points
+    this->pauseButton = new QPushButton("Pause");
+    this->buttonsLayout->addWidget(this->pauseButton);
+
+    // Calibration button
+    this->calButton = new QPushButton("Calibrate");
+    this->buttonsLayout->addWidget(this->calButton);
 
     // Button events
     QObject::connect(this->backButton,SIGNAL(clicked()),this->parent,SLOT(backToLaunch()));
 
     //Create a clickable label for the origin
-    this->imgLabel = new QLabel("Image");
-    QHBoxLayout *imageLayout = new QHBoxLayout();
-    imageLayout->addWidget(this->imgLabel);
-    imageLayout->setAlignment(Qt::AlignCenter);
-    mainLayout->addLayout(imageLayout,Qt::AlignCenter);
+    this->imgLabel = new CalibrationLabel();
+    this->imageLayout = new QHBoxLayout();
+    this->imageLayout->addWidget(this->imgLabel);
+    this->imageLayout->setAlignment(Qt::AlignCenter);
+    this->mainLayout->addLayout(this->imageLayout,Qt::AlignCenter);
 
-    this->setLayout(mainLayout);
+    QObject::connect(this->parent,SIGNAL(updateImageSignal(cv::Mat*)),this,SLOT(updateImage(cv::Mat *)));
+
+    this->setLayout(this->mainLayout);
     this->setAttribute(Qt::WA_DeleteOnClose);
 }
 CalibrationWidget::~CalibrationWidget(){
     #ifdef LOG
     std::cout<<"CalibrationWidget destroyed...."<<std::endl;
     #endif
+}
+
+void CalibrationWidget::updateImage(cv::Mat *frame){
+
+    Mat dest;
+    cvtColor(*frame,dest,cv::COLOR_RGB2BGR);
+    QImage i = QImage((uchar *)dest.data,dest.cols,dest.rows,dest.step,QImage::Format_RGB888);
+    this->imgLabel->setPixmap(QPixmap::fromImage(i));
 }

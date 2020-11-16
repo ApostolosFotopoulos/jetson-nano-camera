@@ -32,7 +32,6 @@ public:
 public slots:
     void updateImage(cv::Mat *frame);
 public:
-    bool isRunning = false;
     int originX = 0;
     int originY = 0;
     int distance = 0;

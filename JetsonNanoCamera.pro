@@ -35,7 +35,8 @@ SOURCES += \
     playerwidget.cpp \
     rangeslider.cpp \
     video.cpp \
-    originlabel.cpp
+    originlabel.cpp \
+    calibrationlabel.cpp
 
 HEADERS += \
     calibrationwidget.h \
@@ -48,7 +49,8 @@ HEADERS += \
     playerwidget.h \
     rangeslider.h \
     video.h \
-    originlabel.h
+    originlabel.h \
+    calibrationlabel.h
 
 INCLUDEPATH += /usr/include/opencv4
 LIBS += -L/usr/lib `pkg-config --libs opencv` -L/usr/include/opencv4 -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lm
